@@ -8,15 +8,15 @@ import LogList from './components/LogList';
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/logs" element={<LogList />} />
           <Route path="/log" element={<DailyLogForm />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 
