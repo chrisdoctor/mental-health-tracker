@@ -11,7 +11,10 @@ const GoogleLoginButton = () => {
   };
 
   return (
-    <button onClick={handleGoogleLogin}>
+    <button
+      onClick={handleGoogleLogin}
+      className="bg-primary hover:bg-accent text-white font-bold py-2 px-6 rounded transition-colors duration-300 ease-in-out"
+    >
       Login with Google
     </button>
   );
