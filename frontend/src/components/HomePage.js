@@ -3,44 +3,31 @@ import GoogleLoginButton from './GoogleLoginButton';
 
 const HomePage = () => {
   const [token, setToken] = useState(null);
-  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     // Check if token is in the URL
     const urlParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = urlParams.get('token');
-    const nameFromUrl = urlParams.get('name'); // Assuming the user's name is passed in the URL as 'name'
 
     if (tokenFromUrl) {
-      // Store the token and user name in localStorage
+      // Store the token in localStorage
       localStorage.setItem('token', tokenFromUrl);
       setToken(tokenFromUrl);
-
-      if (nameFromUrl) {
-        localStorage.setItem('userName', nameFromUrl);
-        setUserName(nameFromUrl);
-      }
 
       // Clear the token from the URL (optional, to make the URL cleaner)
       window.history.replaceState({}, document.title, '/');
     } else {
-      // Check localStorage for token and user name
+      // Check localStorage for token
       const storedToken = localStorage.getItem('token');
-      const storedName = localStorage.getItem('userName');
       if (storedToken) {
         setToken(storedToken);
-      }
-      if (storedName) {
-        setUserName(storedName);
       }
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('userName'); // Clear the stored name
     setToken(null);
-    setUserName('');
     window.location.href = '/'; // Redirect back to home after logout
   };
 
@@ -52,7 +39,7 @@ const HomePage = () => {
         {token ? (
           <div>
             <p className="text-xl text-primary mb-6">
-              Hi {userName ? userName : 'User'}, you are logged in!
+              You are logged in!
             </p>
             <div className="flex justify-center space-x-4">
               <button
