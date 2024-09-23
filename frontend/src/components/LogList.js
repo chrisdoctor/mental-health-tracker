@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import LogGraph from './LogGraph';
 
 const LogList = () => {
@@ -10,6 +10,9 @@ const LogList = () => {
   const [field2, setField2] = useState('');
   const [field3, setField3] = useState('');
   const [filteredLogs, setFilteredLogs] = useState([]);
+  
+  // Reference for scrolling to the graph section
+  const graphSectionRef = useRef(null);
 
   const logFields = [
     'mood_rating',
@@ -50,11 +53,18 @@ const LogList = () => {
     fetchLogs();
   }, []);
 
-  // Handle graph generation
+  // Handle graph generation and scroll to graph section
   const handleGenerateGraph = () => {
     const numberOfLogs = graphType === 'weekly' ? 7 : 30;
     const latestLogs = logs.slice(-numberOfLogs);
     setFilteredLogs(latestLogs);
+
+    // Scroll to graph section
+    setTimeout(() => {
+      if (graphSectionRef.current) {
+        graphSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
   };
 
   if (loading) {
@@ -123,12 +133,13 @@ const LogList = () => {
           </div>
 
           <div>
-            <label className="block text-primary mb-2">Field 1</label>
+            <label className="block text-primary mb-2">First Metric</label>
             <select
               value={field1}
               onChange={(e) => setField1(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
+              <option value="">Select Field 1</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
@@ -138,12 +149,13 @@ const LogList = () => {
           </div>
 
           <div>
-            <label className="block text-primary mb-2">Field 2</label>
+            <label className="block text-primary mb-2">Second Metric</label>
             <select
               value={field2}
               onChange={(e) => setField2(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
+              <option value="">Select Field 2</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
@@ -153,12 +165,13 @@ const LogList = () => {
           </div>
 
           <div>
-            <label className="block text-primary mb-2">Field 3</label>
+            <label className="block text-primary mb-2">Third Metric</label>
             <select
               value={field3}
               onChange={(e) => setField3(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
+              <option value="">Select Field 3</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
@@ -170,7 +183,8 @@ const LogList = () => {
           <button
             type="button"
             onClick={handleGenerateGraph}
-            className="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded mt-10 mb-10"
+            className="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded mb-8 mt-8"
+            disabled={!field1 || !field2 || !field3} // Disable button if any field is not selected
           >
             Generate Graph
           </button>
@@ -178,9 +192,9 @@ const LogList = () => {
 
         {/* LogGraph Component */}
         {filteredLogs.length > 0 && (
-            <div className="mt-10 mb-10">
-              <LogGraph filteredLogs={filteredLogs} field1={field1} field2={field2} field3={field3} />
-            </div>
+          <div className="mt-4 mb-8" ref={graphSectionRef}>
+            <LogGraph filteredLogs={filteredLogs} field1={field1} field2={field2} field3={field3} />
+          </div>
         )}
       </div>
     </div>
