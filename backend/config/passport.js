@@ -8,7 +8,7 @@ const { JWT_SECRET } = process.env;
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
+    callbackURL: `${process.env.APP_BASE_URL}/auth/google/callback`,
   },
   (accessToken, refreshToken, profile, done) => {
     const user = {
