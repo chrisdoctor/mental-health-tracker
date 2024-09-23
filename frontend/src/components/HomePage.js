@@ -49,7 +49,7 @@ const HomePage = () => {
                 Add Daily Log
               </button>
               <button
-                onClick={() => window.location.href = '/progress'}
+                onClick={() => window.location.href = '/logs'}
                 className="bg-accent hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded"
               >
                 View Progress
