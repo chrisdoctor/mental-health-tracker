@@ -1,29 +1,51 @@
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import GoogleLoginButton from './GoogleLoginButton';
 
 const HomePage = () => {
-  const { token } = useAuth();
-  const navigate = useNavigate();
+  const [token, setToken] = useState(null);
 
-  const handleAddLogClick = () => {
-    navigate('/log');  // Navigate to the daily log form
+  useEffect(() => {
+    // Check if token is in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+
+    if (tokenFromUrl) {
+      // Store the token in localStorage
+      localStorage.setItem('token', tokenFromUrl);
+      setToken(tokenFromUrl);
+
+      // Clear the token from the URL (optional, to make the URL cleaner)
+      window.history.replaceState({}, document.title, '/');
+    } else {
+      // Check localStorage for token
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        setToken(storedToken);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    window.location.href = '/'; // Redirect back to home after logout
   };
 
   return (
     <div>
-      <h1>Welcome</h1>
-      {!token ? (
+      <h1>Welcome </h1>
+
+      {token ? (
         <div>
-          <p>Please log in using your Google account to start tracking your daily mental health progress.</p>
-          <GoogleLoginButton />
+          <p>You are logged in!</p>
+          <button onClick={handleLogout}>Logout</button>
+          <div>
+            <button onClick={() => window.location.href = '/log'}>Add Daily Log</button>
+            <button onClick={() => window.location.href = '/progress'}>View Progress</button>
+          </div>
         </div>
       ) : (
-        <div>
-          <p>You are logged in. Start adding your daily log.</p>
-          <button onClick={handleAddLogClick}>Add Daily Log</button>
-        </div>
+        <GoogleLoginButton />  // Render login button if no token
       )}
     </div>
   );
