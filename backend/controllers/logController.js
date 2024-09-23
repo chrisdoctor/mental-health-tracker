@@ -1,31 +1,33 @@
-const Log = require('../models/log');
+const db = require('../db/db');
 
-const createLog = (req, res) => {
-  const logData = {
-    userId: req.user.googleId,
-    mood: req.body.mood,
-    anxiety: req.body.anxiety,
-    sleepHours: req.body.sleepHours,
-    sleepQuality: req.body.sleepQuality,
-    physicalActivityType: req.body.physicalActivityType,
-    physicalActivityDuration: req.body.physicalActivityDuration,
-    socialInteractions: req.body.socialInteractions,
-    stressLevel: req.body.stressLevel,
-    symptoms: req.body.symptoms,
-    date: new Date().toISOString(),
-  };
+// Controller to create a new log
+const createLog = async (req, res) => {
+  const { moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms } = req.body;
 
-  Log.insertLog(logData, (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to log data' });
-    res.status(200).json({ message: 'Log created successfully' });
-  });
+  try {
+    await db.run(`
+      INSERT INTO logs (user_id, mood_rating, anxiety_level, sleep_hours, sleep_quality, physical_activity, social_interactions, stress_level, symptoms)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.user.id, moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms]
+    );
+
+    res.status(201).json({ message: 'Log created successfully' });
+  } catch (error) {
+    console.error('Error creating log:', error);
+    res.status(500).json({ message: 'Error creating log' });
+  }
 };
 
-const getLogs = (req, res) => {
-  Log.getLogsByUserId(req.user.googleId, (err, logs) => {
-    if (err) return res.status(500).json({ error: 'Failed to retrieve logs' });
-    res.json(logs);
-  });
+// Controller to get all logs for the authenticated user
+const getLogs = async (req, res) => {
+  try {
+    const logs = await db.all(`SELECT * FROM logs WHERE user_id = ?`, [req.user.id]);
+
+    res.status(200).json(logs);
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    res.status(500).json({ message: 'Error fetching logs' });
+  }
 };
 
 module.exports = { createLog, getLogs };
