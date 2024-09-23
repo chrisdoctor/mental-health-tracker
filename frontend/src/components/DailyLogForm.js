@@ -1,80 +1,139 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
 
 const DailyLogForm = () => {
-  const { token } = useAuth();
-  const [logData, setLogData] = useState({
-    mood: '',
-    anxiety: '',
+  const [formData, setFormData] = useState({
+    moodRating: '',
+    anxietyLevel: '',
     sleepHours: '',
     sleepQuality: '',
-    physicalActivityType: '',
-    physicalActivityDuration: '',
+    physicalActivity: '',
     socialInteractions: '',
     stressLevel: '',
-    symptoms: '',
+    symptoms: ''
   });
 
   const handleChange = (e) => {
-    setLogData({
-      ...logData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
+      const token = localStorage.getItem('token');
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/log`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`  // Include the token in the Authorization header
         },
-        body: JSON.stringify(logData),
+        body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
-        alert('Log submitted successfully!');
-      } else {
-        alert('Error submitting log');
+      if (!response.ok) {
+        throw new Error('Failed to submit the log');
       }
+
+      const data = await response.json();
+      console.log('Log submitted successfully', data);
+      alert('Daily log saved successfully!');
     } catch (error) {
-      console.error('Error submitting log', error);
+      console.error('Error submitting log:', error);
+      alert('Failed to submit log');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>Mood Rating:</label>
-      <input type="number" name="mood" value={logData.mood} onChange={handleChange} />
-      
-      <label>Anxiety Level:</label>
-      <input type="number" name="anxiety" value={logData.anxiety} onChange={handleChange} />
+      <h2>Submit Your Daily Log</h2>
+      <label>
+        Mood Rating (1-10):
+        <input
+          type="number"
+          name="moodRating"
+          value={formData.moodRating}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Sleep Hours:</label>
-      <input type="number" name="sleepHours" value={logData.sleepHours} onChange={handleChange} />
+      <label>
+        Anxiety Level (1-10):
+        <input
+          type="number"
+          name="anxietyLevel"
+          value={formData.anxietyLevel}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Sleep Quality:</label>
-      <input type="text" name="sleepQuality" value={logData.sleepQuality} onChange={handleChange} />
+      <label>
+        Sleep Hours:
+        <input
+          type="number"
+          name="sleepHours"
+          value={formData.sleepHours}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Physical Activity Type:</label>
-      <input type="text" name="physicalActivityType" value={logData.physicalActivityType} onChange={handleChange} />
+      <label>
+        Sleep Quality (1-10):
+        <input
+          type="number"
+          name="sleepQuality"
+          value={formData.sleepQuality}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Physical Activity Duration:</label>
-      <input type="text" name="physicalActivityDuration" value={logData.physicalActivityDuration} onChange={handleChange} />
+      <label>
+        Physical Activity (Duration in minutes):
+        <input
+          type="number"
+          name="physicalActivity"
+          value={formData.physicalActivity}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Social Interactions:</label>
-      <input type="text" name="socialInteractions" value={logData.socialInteractions} onChange={handleChange} />
+      <label>
+        Social Interactions (1-10):
+        <input
+          type="number"
+          name="socialInteractions"
+          value={formData.socialInteractions}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Stress Level:</label>
-      <input type="number" name="stressLevel" value={logData.stressLevel} onChange={handleChange} />
+      <label>
+        Stress Level (1-10):
+        <input
+          type="number"
+          name="stressLevel"
+          value={formData.stressLevel}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <label>Symptoms:</label>
-      <textarea name="symptoms" value={logData.symptoms} onChange={handleChange}></textarea>
+      <label>
+        Symptoms (Describe):
+        <textarea
+          name="symptoms"
+          value={formData.symptoms}
+          onChange={handleChange}
+          required
+        />
+      </label>
 
-      <button type="submit">Submit Log</button>
+      <button type="submit">Submit Daily Log</button>
     </form>
   );
 };
