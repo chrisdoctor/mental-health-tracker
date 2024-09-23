@@ -55,6 +55,10 @@ const DailyLogForm = () => {
     window.location.href = '/';  // Redirect to the home page after confirmation
   };
 
+  const redirectToHome = () => {
+    window.location.href = '/';  // Redirect to home page after confirming success
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <form onSubmit={handleSubmit} className="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
@@ -187,7 +191,7 @@ const DailyLogForm = () => {
         <DialogBox
           title="Success!"
           message="Your daily log has been submitted successfully."
-          onClose={() => setShowSuccessDialog(false)}
+          onConfirm={redirectToHome}
         />
       )}
 
