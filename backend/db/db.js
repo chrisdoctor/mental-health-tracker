@@ -14,7 +14,8 @@ db.serialize(() => {
       physical_activity INTEGER,
       social_interactions INTEGER,
       stress_level INTEGER,
-      symptoms TEXT
+      symptoms TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 });

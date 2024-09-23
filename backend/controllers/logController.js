@@ -26,7 +26,7 @@ const createLog = async (req, res) => {
 // Controller to get all logs for the authenticated user
 const getLogs = async (req, res) => {
   try {
-    const logs = await dbAllAsync('SELECT * FROM logs WHERE user_id = ?', [req.user.email]);
+    const logs = await dbAllAsync('SELECT * FROM logs WHERE user_id = ? ORDER BY created_at DESC', [req.user.email]);
 
     if (!logs || logs.length === 0) {
       return res.status(200).json({ message: 'No logs found' });
