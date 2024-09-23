@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import DialogBox from './DialogBox';
 
 const DailyLogForm = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +12,9 @@ const DailyLogForm = () => {
     stressLevel: '',
     symptoms: ''
   });
+
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,105 +40,167 @@ const DailyLogForm = () => {
 
       const data = await response.json();
       console.log('Log submitted successfully', data);
-      alert('Daily log saved successfully!');
+      setShowSuccessDialog(true);  // Show success dialog on successful submission
     } catch (error) {
       console.error('Error submitting log:', error);
       alert('Failed to submit log');
     }
   };
 
+  const handleCancel = () => {
+    setShowCancelDialog(true);  // Show confirmation dialog on cancel
+  };
+
+  const confirmCancel = () => {
+    window.location.href = '/';  // Redirect to the home page after confirmation
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Submit Your Daily Log</h2>
-      <label>
-        Mood Rating (1-10):
-        <input
-          type="number"
-          name="moodRating"
-          value={formData.moodRating}
-          onChange={handleChange}
-          required
-        />
-      </label>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <form onSubmit={handleSubmit} className="bg-white p-8 shadow-md rounded-lg max-w-md w-full">
+        <h2 className="text-2xl font-bold text-primary mb-6 text-center">Submit Daily Log</h2>
+        
+        <div className="flex flex-col space-y-4">
+          <div>
+            <label className="block text-primary mb-2">Mood Rating (1-10)</label>
+            <input
+              type="number"
+              name="moodRating"
+              value={formData.moodRating}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Rate your mood"
+              required
+            />
+          </div>
 
-      <label>
-        Anxiety Level (1-10):
-        <input
-          type="number"
-          name="anxietyLevel"
-          value={formData.anxietyLevel}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Anxiety Level (1-10)</label>
+            <input
+              type="number"
+              name="anxietyLevel"
+              value={formData.anxietyLevel}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Rate your anxiety"
+              required
+            />
+          </div>
 
-      <label>
-        Sleep Hours:
-        <input
-          type="number"
-          name="sleepHours"
-          value={formData.sleepHours}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Sleep Hours</label>
+            <input
+              type="number"
+              name="sleepHours"
+              value={formData.sleepHours}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Hours of sleep"
+              required
+            />
+          </div>
 
-      <label>
-        Sleep Quality (1-10):
-        <input
-          type="number"
-          name="sleepQuality"
-          value={formData.sleepQuality}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Sleep Quality (1-10)</label>
+            <input
+              type="number"
+              name="sleepQuality"
+              value={formData.sleepQuality}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Rate sleep quality"
+              required
+            />
+          </div>
 
-      <label>
-        Physical Activity (Duration in minutes):
-        <input
-          type="number"
-          name="physicalActivity"
-          value={formData.physicalActivity}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Physical Activity (minutes)</label>
+            <input
+              type="number"
+              name="physicalActivity"
+              value={formData.physicalActivity}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Duration of physical activity"
+              required
+            />
+          </div>
 
-      <label>
-        Social Interactions (1-10):
-        <input
-          type="number"
-          name="socialInteractions"
-          value={formData.socialInteractions}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Social Interactions (1-10)</label>
+            <input
+              type="number"
+              name="socialInteractions"
+              value={formData.socialInteractions}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Rate interactions"
+              required
+            />
+          </div>
 
-      <label>
-        Stress Level (1-10):
-        <input
-          type="number"
-          name="stressLevel"
-          value={formData.stressLevel}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Stress Level (1-10)</label>
+            <input
+              type="number"
+              name="stressLevel"
+              value={formData.stressLevel}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Rate stress level"
+              required
+            />
+          </div>
 
-      <label>
-        Symptoms (Describe):
-        <textarea
-          name="symptoms"
-          value={formData.symptoms}
-          onChange={handleChange}
-          required
-        />
-      </label>
+          <div>
+            <label className="block text-primary mb-2">Symptoms (Describe)</label>
+            <textarea
+              name="symptoms"
+              value={formData.symptoms}
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 rounded"
+              placeholder="Any symptoms?"
+              required
+            />
+          </div>
 
-      <button type="submit">Submit Daily Log</button>
-    </form>
+          <div className="flex justify-between">
+            <button
+              type="submit"
+              className="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded"
+            >
+              Submit
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
+
+      {/* Success Dialog */}
+      {showSuccessDialog && (
+        <DialogBox
+          title="Success!"
+          message="Your daily log has been submitted successfully."
+          onClose={() => setShowSuccessDialog(false)}
+        />
+      )}
+
+      {/* Cancel Confirmation Dialog */}
+      {showCancelDialog && (
+        <DialogBox
+          title="Confirm Cancel"
+          message="Are you sure you want to discard your changes?"
+          onClose={() => setShowCancelDialog(false)}
+          onConfirm={confirmCancel}
+        />
+      )}
+    </div>
   );
 };
 
