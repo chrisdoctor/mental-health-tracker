@@ -1,12 +1,9 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
 
 const GoogleLoginButton = () => {
-  const { login } = useAuth();
-
   const handleGoogleLogin = async () => {
     try {
-      // Redirect to the backend for Google OAuth login
+      // Redirect the user to the backend to initiate Google login
       window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/google`;
     } catch (error) {
       console.error('Login error', error);

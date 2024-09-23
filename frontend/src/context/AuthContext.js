@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
@@ -6,12 +6,6 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    }
-  }, [token, navigate]);
 
   const login = async (googleToken) => {
     try {
@@ -23,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       if (data.token) {
         localStorage.setItem('token', data.token);
         setToken(data.token);
-        navigate('/');
+        navigate('/');  // Redirect to base URL after successful login
       }
     } catch (error) {
       console.error('Login failed', error);
@@ -33,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setToken(null);
-    navigate('/login');
+    navigate('/');  // Redirect to base URL on logout
   };
 
   return (
