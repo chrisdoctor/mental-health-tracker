@@ -41,7 +41,7 @@ const HomePage = () => {
           <button onClick={handleLogout}>Logout</button>
           <div>
             <button onClick={() => window.location.href = '/log'}>Add Daily Log</button>
-            <button onClick={() => window.location.href = '/progress'}>View Progress</button>
+            <button onClick={() => window.location.href = '/logs'}>View Progress</button>
           </div>
         </div>
       ) : (
