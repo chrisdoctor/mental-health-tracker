@@ -7,22 +7,21 @@ require('dotenv').config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Route to initiate Google login
+// Initiate Google login
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-// Route to handle Google OAuth callback
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/' }), 
-  (req, res) => {
-    // Generate a JWT token for the user
-    const token = jwt.sign(
-      { id: req.user.id, email: req.user.emails[0].value },
-      JWT_SECRET,
-      { expiresIn: '1h' }  // Expire it in 1 hour
-    );
-
-    res.json({ token });
-  }
-);
+// Handle Google OAuth callback
+router.get('/google/callback', (req, res, next) => {
+  console.log('Authorization code:', req.query.code);  // Check if Google sent the code
+  next();
+}, passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
+  console.log("Authenticated with Google");
+  const token = jwt.sign(
+    { id: req.user.id, email: req.user.emails[0].value },
+    JWT_SECRET,
+    { expiresIn: '1h' }
+  );
+  res.json({ token });
+});
 
 module.exports = router;

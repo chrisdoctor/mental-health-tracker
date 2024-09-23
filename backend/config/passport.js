@@ -8,6 +8,14 @@ passport.use(new GoogleStrategy({
     callbackURL: `${process.env.APP_BASE_URL}/auth/google/callback`,  
   },
   async (accessToken, refreshToken, profile, done) => {
+    console.log("accessToken", accessToken)
+    console.log("profile", profile)
+
+    if (!profile) {
+      console.error('Failed to retrieve user profile');
+      return done(new Error('Failed to retrieve user profile'));
+    }
+    
     const user = {
       id: profile.id,
       displayName: profile.displayName,
