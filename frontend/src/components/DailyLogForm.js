@@ -1,4 +1,3 @@
-// src/components/DailyLogForm.js
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,7 +24,7 @@ const DailyLogForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     try {
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/log`, {
         method: 'POST',
