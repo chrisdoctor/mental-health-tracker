@@ -178,7 +178,7 @@ const LogList = () => {
 
         {/* LogGraph Component */}
         {filteredLogs.length > 0 && (
-            <div className="mt-10">
+            <div className="mt-10 mb-10">
               <LogGraph filteredLogs={filteredLogs} field1={field1} field2={field2} field3={field3} />
             </div>
         )}
