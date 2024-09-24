@@ -6,18 +6,29 @@ const db = require('../db/db');
 const dbAllAsync = util.promisify(db.all).bind(db);
 const dbRunAsync = util.promisify(db.run).bind(db);
 
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
 // Controller to create a new daily log for the authenticated user
 const createLog = async (req, res) => {
   const { moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms } = req.body;
   const logId = uuidv4();  
-  const createdAt = new Date();  
+  const createdAt = formatDate(new Date()); 
 
   try {
     // Insert log into the database
     await dbRunAsync(`
       INSERT INTO logs (id, user_id, mood_rating, anxiety_level, sleep_hours, sleep_quality, physical_activity, social_interactions, stress_level, symptoms, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [logId, req.user.email, moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms, createdAt]
+      [logId, req.user.email, Number(moodRating), Number(anxietyLevel), Number(sleepHours), Number(sleepQuality), Number(physicalActivity), Number(socialInteractions), Number(stressLevel), symptoms, createdAt]
     );
 
     // Emit the logUpdated event via WebSocket
