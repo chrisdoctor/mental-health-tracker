@@ -94,7 +94,7 @@ const LogList = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10">
+    <div className="max-w-2xl mx-auto mt-10 mb-14">
       <h2 className="text-2xl font-semibold mb-6 text-center text-primary">Your Daily Logs</h2>
 
       {logs.length > 0 ? (
