@@ -1,4 +1,5 @@
 const util = require('util');
+const { v4: uuidv4 } = require('uuid'); 
 const db = require('../db/db');
 
 // Promisify db.all() to work with async/await
@@ -8,13 +9,21 @@ const dbRunAsync = util.promisify(db.run).bind(db);
 // Controller to create a new daily log for the authenticated user
 const createLog = async (req, res) => {
   const { moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms } = req.body;
+  const logId = uuidv4();  
+  const createdAt = new Date();  
 
   try {
+    // Insert log into the database
     await dbRunAsync(`
-      INSERT INTO logs (user_id, mood_rating, anxiety_level, sleep_hours, sleep_quality, physical_activity, social_interactions, stress_level, symptoms)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.email, moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms]
+      INSERT INTO logs (id, user_id, mood_rating, anxiety_level, sleep_hours, sleep_quality, physical_activity, social_interactions, stress_level, symptoms, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [logId, req.user.email, moodRating, anxietyLevel, sleepHours, sleepQuality, physicalActivity, socialInteractions, stressLevel, symptoms, createdAt]
     );
+
+    // Emit the logUpdated event via WebSocket
+    const newLog = { id: logId, user_id: req.user.email, mood_rating: moodRating, anxiety_level: anxietyLevel, sleep_hours: sleepHours, sleep_quality: sleepQuality, physical_activity: physicalActivity, social_interactions: socialInteractions, stress_level: stressLevel, symptoms: symptoms, created_at: createdAt };
+    const io = req.app.get('socketio');  // Retrieve io instance from the app
+    io.emit('logUpdated', newLog);  // Emit the logUpdated event to all clients
 
     res.status(201).json({ message: 'Log created successfully' });
   } catch (error) {
