@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { io } from 'socket.io-client'; // Importing socket.io-client
+import { io } from 'socket.io-client';
 import LogGraph from './LogGraph';
+import { useNavigate } from 'react-router-dom'; // Import for navigation
 
 const LogList = () => {
   const [logs, setLogs] = useState([]);
@@ -11,9 +12,8 @@ const LogList = () => {
   const [field2, setField2] = useState('');
   const [field3, setField3] = useState('');
   const [filteredLogs, setFilteredLogs] = useState([]);
-
-  // Reference for scrolling to the graph section
   const graphSectionRef = useRef(null);
+  const navigate = useNavigate(); // Hook for navigation
 
   const logFields = [
     'mood_rating',
@@ -42,8 +42,6 @@ const LogList = () => {
         }
 
         const data = await response.json();
-
-        console.log("DATA", data)
         setLogs(data);
         setLoading(false);
       } catch (error) {
@@ -55,29 +53,21 @@ const LogList = () => {
 
     fetchLogs();
 
-    // Set up WebSocket connection
     const socket = io(process.env.REACT_APP_BACKEND_URL);
-
-    // Listen for log updates from the server
     socket.on('logUpdated', (newLog) => {
-      setLogs((prevLogs) => {
-        return [newLog, ...prevLogs]
-      });  // Append new log to the current list
+      setLogs((prevLogs) => [newLog, ...prevLogs]);
     });
 
-    // Clean up the WebSocket connection when the component is unmounted
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  // Handle graph generation and scroll to graph section
   const handleGenerateGraph = () => {
     const numberOfLogs = graphType === 'weekly' ? 7 : 30;
     const latestLogs = logs.slice(-numberOfLogs);
     setFilteredLogs(latestLogs);
 
-    // Scroll to graph section
     setTimeout(() => {
       if (graphSectionRef.current) {
         graphSectionRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -95,8 +85,22 @@ const LogList = () => {
 
   return (
     <div className="max-w-2xl mx-auto mt-10 mb-14">
+      {/* Buttons */}
+      <div className="flex justify-start space-x-4 mb-14">
+        <button
+          onClick={() => navigate('/')}
+          className="text-primary cursor-pointer underline"
+        >
+          Back to Home
+        </button>
+        <button
+          onClick={() => window.location.href = '/log'}
+          className="bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90"
+        >
+          Add Daily Log
+        </button>
+      </div>
       <h2 className="text-2xl font-semibold mb-6 text-center text-primary">Your Daily Logs</h2>
-
       {logs.length > 0 ? (
         <div className="overflow-auto max-h-64 mx-5 mb-10 border border-gray-300 shadow-sm rounded-lg">
           <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg table-fixed">
@@ -214,13 +218,12 @@ const LogList = () => {
               type="button"
               onClick={handleGenerateGraph}
               className="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-6 rounded mb-8 mt-8"
-              disabled={!field1 || !field2 || !field3} // Disable button if any field is not selected
+              disabled={!field1 || !field2 || !field3}
             >
               Generate Graph
             </button>
           </form>
 
-          {/* LogGraph Component */}
           {filteredLogs.length > 0 && (
             <div className="mt-4 mb-8" ref={graphSectionRef}>
               <LogGraph filteredLogs={filteredLogs} field1={field1} field2={field2} field3={field3} />
