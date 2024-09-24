@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { io } from 'socket.io-client'; // Importing socket.io-client
 import LogGraph from './LogGraph';
 
 const LogList = () => {
@@ -10,7 +11,7 @@ const LogList = () => {
   const [field2, setField2] = useState('');
   const [field3, setField3] = useState('');
   const [filteredLogs, setFilteredLogs] = useState([]);
-  
+
   // Reference for scrolling to the graph section
   const graphSectionRef = useRef(null);
 
@@ -41,6 +42,8 @@ const LogList = () => {
         }
 
         const data = await response.json();
+
+        console.log("DATA", data)
         setLogs(data);
         setLoading(false);
       } catch (error) {
@@ -51,6 +54,23 @@ const LogList = () => {
     };
 
     fetchLogs();
+
+    // Set up WebSocket connection
+    const socket = io(process.env.REACT_APP_BACKEND_URL);
+
+    // Listen for log updates from the server
+    socket.on('logUpdated', (newLog) => {
+      console.log("UPDATED =======", newLog);
+      setLogs((prevLogs) => {
+        console.log("PREVLOGS", prevLogs);
+        return [...prevLogs, newLog]
+      });  // Append new log to the current list
+    });
+
+    // Clean up the WebSocket connection when the component is unmounted
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   // Handle graph generation and scroll to graph section
@@ -80,7 +100,7 @@ const LogList = () => {
       <h2 className="text-2xl font-semibold mb-6 text-center text-primary">Your Daily Logs</h2>
 
       {logs.length > 0 ? (
-        <div className="overflow-auto max-h-64 mb-10">
+        <div className="overflow-auto max-h-64 mx-6 mb-10">
           <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg">
             <thead>
               <tr className="bg-primary text-white text-left">
@@ -117,7 +137,7 @@ const LogList = () => {
       )}
 
       {/* Progress Graph Section */}
-      <div className="mt-10">
+      <div className="mt-10 mx-6">
         <h2 className="text-2xl font-semibold mb-6 text-center text-primary">Progress Graph</h2>
         <form className="grid grid-cols-1 gap-4 max-w-lg mx-auto">
           <div>
@@ -139,7 +159,7 @@ const LogList = () => {
               onChange={(e) => setField1(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Select Field 1</option>
+              <option value="">Select First Metric</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
@@ -155,7 +175,7 @@ const LogList = () => {
               onChange={(e) => setField2(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Select Field 2</option>
+              <option value="">Select Second Metric</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
@@ -171,7 +191,7 @@ const LogList = () => {
               onChange={(e) => setField3(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
             >
-              <option value="">Select Field 3</option>
+              <option value="">Select Third Metric</option>
               {logFields.map((field, index) => (
                 <option key={index} value={field}>
                   {field.replace('_', ' ').toUpperCase()}
