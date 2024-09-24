@@ -60,10 +60,8 @@ const LogList = () => {
 
     // Listen for log updates from the server
     socket.on('logUpdated', (newLog) => {
-      console.log("UPDATED =======", newLog);
       setLogs((prevLogs) => {
-        console.log("PREVLOGS", prevLogs);
-        return [...prevLogs, newLog]
+        return [newLog, ...prevLogs]
       });  // Append new log to the current list
     });
 
