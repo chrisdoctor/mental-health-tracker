@@ -4,10 +4,15 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 const dotenv = require('dotenv');
 const dns = require('dns');
+const util = require('util');
+const db = require('../db/db');  // Assuming db.js is the database configuration file
 
 dotenv.config();
-
 dns.setDefaultResultOrder('ipv4first');
+
+// Promisify the SQLite database methods
+const dbGetAsync = util.promisify(db.get).bind(db);
+const dbRunAsync = util.promisify(db.run).bind(db);
 
 // Route to initiate Google OAuth flow
 router.get('/google', (req, res) => {
@@ -41,6 +46,24 @@ router.get('/google/callback', async (req, res) => {
     });
 
     const { id_token } = tokenResponse.data;
+
+    // Decode the id_token to extract user info
+    const decodedToken = jwt.decode(id_token);
+    const email = decodedToken.email;  // Get user email from token
+
+    try {
+      // Check if the user already exists in the database
+      const user = await dbGetAsync('SELECT * FROM users WHERE email = ?', [email]);
+
+      if (!user) {
+        // User does not exist, insert them into the database
+        await dbRunAsync('INSERT INTO users (email) VALUES (?)', [email]);
+        console.log('New user added to the database:', email);
+      }
+    } catch (dbError) {
+      console.error('Database error:', dbError);
+      return res.status(500).send('Internal server error');
+    }
 
     // Redirect back to the frontend with the token in the query string
     res.redirect(`${process.env.REACT_APP_BASE_URL}/?token=${id_token}`);

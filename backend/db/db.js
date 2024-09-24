@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./mental_health_tracker.db');
 
-// Create table if it doesn't exist
 db.serialize(() => {
+  // Create logs table
   db.run(`
     CREATE TABLE IF NOT EXISTS logs (
       id TEXT PRIMARY KEY,            
@@ -16,6 +16,14 @@ db.serialize(() => {
       stress_level INTEGER,
       symptoms TEXT,
       created_at DATETIME             
+    )
+  `);
+  // Create users table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
 });
