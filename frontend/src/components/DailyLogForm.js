@@ -191,7 +191,7 @@ const DailyLogForm = () => {
         <DialogBox
           title="Success!"
           message="Your daily log has been submitted successfully."
-          onConfirm={redirectToHome}
+          onClose={redirectToHome}
         />
       )}
 
