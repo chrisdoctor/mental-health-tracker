@@ -14,7 +14,7 @@ router.get('/google', (req, res) => {
   const googleAuthURL = 'https://accounts.google.com/o/oauth2/v2/auth';
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID,
-    redirect_uri: 'http://localhost:4000/auth/google/callback',
+    redirect_uri: `${process.env.APP_BASE_URL}/auth/google/callback`,
     response_type: 'code',
     scope: 'profile email',
     access_type: 'offline',
@@ -28,7 +28,6 @@ router.get('/google/callback', async (req, res) => {
   const { code } = req.query;  // Get authorization code from query params
 
   try {
-    console.log("Code", code)
     // Exchange authorization code for tokens
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', null, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -36,7 +35,7 @@ router.get('/google/callback', async (req, res) => {
         code: code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: 'http://localhost:4000/auth/google/callback',
+        redirect_uri: `${process.env.APP_BASE_URL}/auth/google/callback`,
         grant_type: 'authorization_code',
       },
     });
@@ -44,7 +43,7 @@ router.get('/google/callback', async (req, res) => {
     const { id_token } = tokenResponse.data;
 
     // Redirect back to the frontend with the token in the query string
-    res.redirect(`http://localhost:3000/?token=${id_token}`);
+    res.redirect(`${process.env.REACT_APP_BASE_URL}/?token=${id_token}`);
 
   } catch (error) {
     console.error('Error during token exchange:', error.response ? error.response.data : error.message);
