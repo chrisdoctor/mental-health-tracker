@@ -120,6 +120,12 @@ The backend provides several API endpoints for managing user authentication and 
 
 - **Authorization**: All endpoints under `/api` are protected and require the client to send the token in the `Authorization` header in the following format:
 
+```bash
+Authorization: Bearer <token>
+```
+
+If the token is missing or invalid, the server responds with a `401 Unauthorized` error.
+
 ## WebSocket Integration
 
 The application integrates WebSocket functionality using `socket.io` to provide real-time updates for the daily logs. When a user submits a new daily log, the backend broadcasts the updated log data to all connected clients. This ensures that users see updates immediately, without the need for a manual refresh.
